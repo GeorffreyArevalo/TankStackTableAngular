@@ -1,0 +1,69 @@
+
+<table class="table table-striped table-hover">
+
+  <thead>
+
+    @for (headerGroup of table.getHeaderGroups(); track headerGroup.id) {
+
+
+      <tr>
+
+        @for (headerItem of headerGroup.headers; track headerItem.id) {
+
+          @if( !headerItem.isPlaceholder ) {
+
+            <th scope="col">
+
+              <ng-container
+                *flexRender="
+                  headerItem.column.columnDef.header;
+                  props: headerItem.getContext();
+                  let header
+                "
+              >
+                <div [innerHTML]="header"></div>
+              </ng-container>
+
+            </th>
+
+          }
+
+        }
+
+      </tr>
+
+
+    }
+
+  </thead>
+
+  <tbody>
+
+    @for (row of table.getRowModel().rows; track row.id) {
+
+        <tr>
+
+          @for (cell of row.getVisibleCells(); track cell.id) {
+
+            <td>
+              <ng-container
+                *flexRender="
+                  cell.column.columnDef.cell;
+                  props: cell.getContext();
+                  let cell
+                "
+              >
+                <div [innerHTML]="cell"></div>
+              </ng-container>
+
+            </td>
+
+          }
+
+        </tr>
+
+    }
+
+  </tbody>
+
+</table>
