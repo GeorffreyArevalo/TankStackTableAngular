@@ -1,4 +1,39 @@
 
+<div class="d-flex justify-content-end">
+
+
+  <div class="dropdown mb-1">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+      Columnas
+    </button>
+
+    <div class="dropdown-menu p-4">
+
+      <div class="list-group">
+
+        @for (column of table.getAllColumns(); track column.id) {
+
+          <button
+            class="list-group-item list-group-item-action text-center" type="button"
+            [ngClass]="{
+              'list-group-item-info': column.getIsVisible()
+            }"
+            (click)=" column.toggleVisibility(!column.getIsVisible())"
+            [disabled]="table.getVisibleLeafColumns().length === 1 && column.getIsVisible()"
+          >
+            {{ column.columnDef.header }}
+          </button>
+
+        }
+
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
 <table class="table table-striped table-hover">
 
   <thead>

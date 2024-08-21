@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Column, FlexRenderDirective, PaginationState, SortingState, createAngularTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/angular-table';
+import { Column, FlexRenderDirective, PaginationState, SortingState, VisibilityState, createAngularTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/angular-table';
 import { DataCars } from '../../helpers/get-data-cars.helpers';
 
+import { CommonModule } from '@angular/common';
 import { Car } from '../../interface/car.interface';
 import { defaultColumns } from './columns-definition';
 
@@ -9,7 +10,7 @@ import { defaultColumns } from './columns-definition';
   selector: 'custom-table',
   standalone: true,
   imports: [
-
+    CommonModule,
     FlexRenderDirective
 
   ],
@@ -28,6 +29,7 @@ export class CustomTableComponent {
     pageSize: 10
   });
   public readonly sortingState = signal<SortingState>([]);
+  public readonly visibilityState = signal<VisibilityState>({});
 
   public table = createAngularTable(() => ({
     data: this.data(),
@@ -38,6 +40,7 @@ export class CustomTableComponent {
     state: {
       pagination: this.paginationState(),
       sorting: this.sortingState(),
+      columnVisibility: this.visibilityState(),
     },
     onPaginationChange: ( valueOrFunction ) => {
       typeof valueOrFunction === 'function'
@@ -48,6 +51,12 @@ export class CustomTableComponent {
       typeof valueSorting === 'function'
       ? this.sortingState.update( valueSorting )
       : this.sortingState.set( valueSorting );
+    },
+    onColumnVisibilityChange: ( valueOrFunction ) => {
+      const visiblityStateChange = valueOrFunction instanceof Function
+      ? valueOrFunction( this.visibilityState() )
+      : valueOrFunction;
+      this.visibilityState.set( visiblityStateChange );
     }
   }));
 
@@ -61,7 +70,6 @@ export class CustomTableComponent {
   onSortingColumn( column: Column<Car> ) {
     column.toggleSorting( column.getIsSorted() === 'asc' );
   }
-
 
 
 }
