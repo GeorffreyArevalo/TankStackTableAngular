@@ -1,6 +1,17 @@
 
-import { ColumnDef } from '@tanstack/angular-table';
+import { ColumnDef, FilterFn, Row } from '@tanstack/angular-table';
 import { Car } from '../../interface/car.interface';
+
+const customFilterFn: FilterFn<Car> = (
+  row: Row<Car>,
+  columnId: string,
+  filterValue: string,
+  addMeta: (meta: any) => void
+): boolean => {
+  filterValue = filterValue.toLowerCase();
+  const rowValues = Object.values( row.original ).map( value => value).join(' ').toLowerCase();
+  return rowValues.includes( filterValue );
+}
 
 
 export const defaultColumns: ColumnDef<Car>[] = [
@@ -16,6 +27,7 @@ export const defaultColumns: ColumnDef<Car>[] = [
     accessorFn: (row) => row.make,
     cell: info => info.getValue(),
     header: 'Make',
+    filterFn: customFilterFn,
   },
   {
     id: 'model',

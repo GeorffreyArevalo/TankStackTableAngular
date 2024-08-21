@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Column, FlexRenderDirective, PaginationState, SortingState, VisibilityState, createAngularTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/angular-table';
+import { Column, ColumnFiltersState, FlexRenderDirective, PaginationState, SortingState, VisibilityState, createAngularTable, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/angular-table';
 import { DataCars } from '../../helpers/get-data-cars.helpers';
 
 import { CommonModule } from '@angular/common';
 import { Car } from '../../interface/car.interface';
+import { InputDebouncerComponent } from '../input-debouncer/input-debouncer.component';
 import { defaultColumns } from './columns-definition';
 
 @Component({
@@ -11,7 +12,8 @@ import { defaultColumns } from './columns-definition';
   standalone: true,
   imports: [
     CommonModule,
-    FlexRenderDirective
+    FlexRenderDirective,
+    InputDebouncerComponent,
 
   ],
   templateUrl: './custom-table.component.html',
@@ -30,6 +32,7 @@ export class CustomTableComponent {
   });
   public readonly sortingState = signal<SortingState>([]);
   public readonly visibilityState = signal<VisibilityState>({});
+  public readonly comlumnsFilters = signal<ColumnFiltersState>([]);
 
   public table = createAngularTable(() => ({
     data: this.data(),
@@ -37,10 +40,12 @@ export class CustomTableComponent {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       pagination: this.paginationState(),
       sorting: this.sortingState(),
       columnVisibility: this.visibilityState(),
+      columnFilters: this.comlumnsFilters(),
     },
     onPaginationChange: ( valueOrFunction ) => {
       typeof valueOrFunction === 'function'
@@ -57,6 +62,11 @@ export class CustomTableComponent {
       ? valueOrFunction( this.visibilityState() )
       : valueOrFunction;
       this.visibilityState.set( visiblityStateChange );
+    },
+    onColumnFiltersChange: ( filterChange ) => {
+      filterChange instanceof Function
+      ? this.comlumnsFilters.update( filterChange )
+      : this.comlumnsFilters.set( filterChange );
     }
   }));
 
@@ -69,6 +79,11 @@ export class CustomTableComponent {
 
   onSortingColumn( column: Column<Car> ) {
     column.toggleSorting( column.getIsSorted() === 'asc' );
+  }
+
+  onSearch( value: string ) {
+    this.table.getColumn('make')?.setFilterValue(value);
+
   }
 
 
