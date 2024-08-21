@@ -17,6 +17,11 @@ const customFilterFn: FilterFn<Car> = (
 export const defaultColumns: ColumnDef<Car>[] = [
 
   {
+    id: 'select',
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     id: 'vin',
     accessorFn: (row) => row.vin,
     cell: info => info.getValue(),
@@ -52,6 +57,11 @@ export const defaultColumns: ColumnDef<Car>[] = [
     accessorFn: (row) => row.year,
     cell: info => info.getValue(),
     header: 'Year',
+  },
+  {
+    id: 'actions',
+    enableSorting: false,
+    enableHiding: false,
   },
 
 ]

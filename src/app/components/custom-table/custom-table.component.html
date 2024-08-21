@@ -1,15 +1,20 @@
 
-<div class="d-flex justify-content-between">
+<div class="d-flex justify-content-between mb-1">
 
-  <div>
+  <div class="d-flex gap-2">
     <input-debouncer
       placeholder="Buscar..."
       (onDebouce)="onSearch($event)"
     />
+
+    @if( showButton() ){
+      <button class="btn btn-danger" (click)="onShowDataSelected()">Enviar</button>
+    }
+
   </div>
 
 
-  <div class="dropdown mb-1">
+  <div class="dropdown">
     <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
       Columnas
     </button>
@@ -20,16 +25,19 @@
 
         @for (column of table.getAllColumns(); track column.id) {
 
-          <button
-            class="list-group-item list-group-item-action text-center" type="button"
-            [ngClass]="{
-              'list-group-item-info': column.getIsVisible()
-            }"
-            (click)=" column.toggleVisibility(!column.getIsVisible())"
-            [disabled]="table.getVisibleLeafColumns().length === 1 && column.getIsVisible()"
-          >
-            {{ column.columnDef.header }}
-          </button>
+          @if( column.id !== 'select' && column.id !== 'actions' ){
+            <button
+              class="list-group-item list-group-item-action text-center" type="button"
+              [ngClass]="{
+                'list-group-item-info': column.getIsVisible()
+              }"
+              (click)=" column.toggleVisibility(!column.getIsVisible())"
+              [disabled]="table.getVisibleLeafColumns().length === 3 && column.getIsVisible()"
+            >
+              {{ column.columnDef.header }}
+            </button>
+          }
+
 
         }
 
@@ -54,22 +62,35 @@
 
           @if( !headerItem.isPlaceholder ) {
 
-            <th scope="col">
+            @if (headerItem.id === 'select') {
+              <th>
 
-              <ng-container
-                *flexRender="
-                  headerItem.column.columnDef.header;
-                  props: headerItem.getContext();
-                  let header
-                "
-              >
-                <button (click)="onSortingColumn(headerItem.column)" class="btn btn-dark d-flex gap-1">
-                  <div [innerHTML]="header"></div>
-                  <i class="bi bi-chevron-expand"></i>
-                </button>
-              </ng-container>
+                <input type="checkbox" class="form-check-input"
+                  [checked]="table.getIsAllRowsSelected()"
+                  [indeterminate]="table.getIsSomeRowsSelected()"
+                  (change)="table.toggleAllRowsSelected()"
+                />
 
-            </th>
+              </th>
+            }@else {
+              <th scope="col">
+
+                <ng-container
+                  *flexRender="
+                    headerItem.column.columnDef.header;
+                    props: headerItem.getContext();
+                    let header
+                  "
+                >
+                  <button (click)="onSortingColumn(headerItem.column)" class="btn btn-dark d-flex gap-1">
+                    <div [innerHTML]="header"></div>
+                    <i class="bi bi-chevron-expand"></i>
+                  </button>
+                </ng-container>
+
+              </th>
+            }
+
 
           }
 
@@ -91,15 +112,35 @@
           @for (cell of row.getVisibleCells(); track cell.id) {
 
             <td>
-              <ng-container
-                *flexRender="
-                  cell.column.columnDef.cell;
-                  props: cell.getContext();
-                  let cell
-                "
-              >
-                <div [innerHTML]="cell"></div>
-              </ng-container>
+
+              @if( cell.column.id === 'select' ) {
+
+                <input type="checkbox" class="form-check-input"
+                  [checked]="row.getIsSelected()"
+                  (change)="row.toggleSelected()"
+                />
+
+              }@else if( cell.column.id === 'actions' ) {
+
+                <div class="btn-group">
+                  <button class="btn btn-dark btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                  <ul class="dropdown-menu">
+                    <li><button class="dropdown-item" type="button" (click)="onCopyOnClipboard(row)">Copiar VIN</button></li>
+                  </ul>
+                </div>
+
+              }@else {
+                <ng-container
+                  *flexRender="
+                    cell.column.columnDef.cell;
+                    props: cell.getContext();
+                    let cell
+                  "
+                >
+                  <div [innerHTML]="cell"></div>
+                </ng-container>
+              }
+
 
             </td>
 
@@ -114,6 +155,10 @@
 </table>
 
 <div class="d-flex justify-content-between">
+
+  <div>
+    <span class="fw-light">{{ table.getFilteredSelectedRowModel().rows.length }} filas seleccionadas de {{table.getFilteredRowModel().rows.length}}</span>
+  </div>
 
   <div>
     <span class="fw-light">Mostrando {{ table.getRowModel().rows.length }} de {{ table.getRowCount() }} registros.</span>
@@ -144,4 +189,10 @@
 
 
 </div>
+
+@if( showAlert() ){
+  <div class="alert alert-success fixed-bottom mx-5" role="alert">
+    {{copyOnClipboard()}} copiado en el portapapeles.
+  </div>
+}
 
