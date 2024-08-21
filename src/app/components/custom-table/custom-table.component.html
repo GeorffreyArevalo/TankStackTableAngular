@@ -21,7 +21,10 @@
                   let header
                 "
               >
-                <div [innerHTML]="header"></div>
+                <button (click)="onSortingColumn(headerItem.column)" class="btn btn-dark d-flex gap-1">
+                  <div [innerHTML]="header"></div>
+                  <i class="bi bi-chevron-expand"></i>
+                </button>
               </ng-container>
 
             </th>

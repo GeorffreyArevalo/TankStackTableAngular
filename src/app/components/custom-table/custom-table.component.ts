@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { FlexRenderDirective, PaginationState, createAngularTable, getCoreRowModel, getPaginationRowModel } from '@tanstack/angular-table';
+import { Column, FlexRenderDirective, PaginationState, SortingState, createAngularTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel } from '@tanstack/angular-table';
 import { DataCars } from '../../helpers/get-data-cars.helpers';
 
 import { Car } from '../../interface/car.interface';
@@ -27,19 +27,27 @@ export class CustomTableComponent {
     pageIndex: 0,
     pageSize: 10
   });
+  public readonly sortingState = signal<SortingState>([]);
 
   public table = createAngularTable(() => ({
     data: this.data(),
     columns: defaultColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     state: {
       pagination: this.paginationState(),
+      sorting: this.sortingState(),
     },
     onPaginationChange: ( valueOrFunction ) => {
       typeof valueOrFunction === 'function'
       ? this.paginationState.update( valueOrFunction )
       : this.paginationState.set( valueOrFunction );
+    },
+    onSortingChange: ( valueSorting ) => {
+      typeof valueSorting === 'function'
+      ? this.sortingState.update( valueSorting )
+      : this.sortingState.set( valueSorting );
     }
   }));
 
@@ -48,6 +56,10 @@ export class CustomTableComponent {
     const element = ( e.target as HTMLSelectElement );
     this.table.setPageSize(+element.value);
 
+  }
+
+  onSortingColumn( column: Column<Car> ) {
+    column.toggleSorting( column.getIsSorted() === 'asc' );
   }
 
 
