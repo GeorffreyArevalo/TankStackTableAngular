@@ -20,7 +20,4 @@ ng serve -o
 
 ## Demostración
 
-<video width="1024" controls autoplay>
-  <source src="https://res.cloudinary.com/dxn0tqsnw/video/upload/v1724267762/brief/DataTable_1_c2tuha.mp4" type="video/mp4">
-</video>
-
+[![Ver Demostración]](https://res.cloudinary.com/dxn0tqsnw/video/upload/v1724267762/brief/DataTable_1_c2tuha.mp4)
